@@ -92,11 +92,13 @@ fn main() -> ! {
   rcc.ahbenr.write( |w| w.dmaen().set_bit() );
 
   // Setup GPIO pin C6 (LED) as push-pull output.
-  gpioc.moder.modify( |_r,w| w.moder6().output() );
-  gpioc.otyper.modify( |_r,w| w.ot6().push_pull() );
-  // Setup GPIO pins A4 and A5 as DAC outputs.
-  gpioa.moder.modify( |_r,w| w.moder4().analog()
-                              .moder5().analog() );
+  unsafe {
+    gpioc.moder.modify( |_r,w| w.moder6().bits( 1 ) );
+    gpioc.otyper.modify( |_r,w| w.ot6().clear_bit() );
+    // Setup GPIO pins A4 and A5 as DAC outputs.
+    gpioa.moder.modify( |_r,w| w.moder4().bits( 3 )
+                                .moder5().bits( 3 ) );
+  }
 
   // Setup stereo audio tones on DAC1/2 using DMA1/2 with
   // TIM6/7 as request generation triggers.
